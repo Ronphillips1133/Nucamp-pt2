@@ -259,22 +259,23 @@ const MainNavigator = createDrawerNavigator(
                 )
             }
         },
+        Favorites: {
+            screen: FavoritesNavigator,
+            navigationOptions: {
+                drawerLabel: 'My Favorites',
+                drawerIcon: ({ tintColor }) => (
+                    <Icon
+                        name='heart'
+                        type='font-awesome'
+                        size={24}
+                        color={tintColor}
+                    />
+                )
+            }
+        },
+
 
     },
-    Favorites: {
-    screen: FavoritesNavigator,
-    navigationOptions: {
-        drawerLabel: 'My Favorites',
-        drawerIcon: ({ tintColor }) => (
-            <Icon
-                name='heart'
-                type='font-awesome'
-                size={24}
-                color={tintColor}
-            />
-        )
-    }
-},
     {
         drawerBackgroundColor: '#CEC8FF',
         contentComponent: CustomDrawerContentComponent
