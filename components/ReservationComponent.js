@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import {
-    Text, View, ScrollView, StyleSheet,
-    Picker, Switch, Button, Modal
-} from 'react-native';
+import { Text, View, StyleSheet, Picker, Switch, Button, Modal, Alert } from 'react-native';
+import { Notifications } from 'expo';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Animatable from 'react-native-animatable';
+import * as Notifications from 'expo-notifications';
+
 
 class Reservation extends Component {
 
@@ -13,9 +14,8 @@ class Reservation extends Component {
         this.state = {
             campers: 1,
             hikeIn: false,
-            date: new Date(),
-            showCalendar: false,
-            showModal: false
+            date: '',
+            // showModal: false
         };
     }
 
@@ -23,28 +23,76 @@ class Reservation extends Component {
         title: 'Reserve Campsite'
     }
 
-    toggleModal() {
-        this.setState({ showModal: !this.state.showModal });
-    }
+    // toggleModal() {
+    //     this.setState({showModal: !this.state.showModal});
+    // }
 
     handleReservation() {
         console.log(JSON.stringify(this.state));
-        this.toggleModal();
+
+        let message = `Number of Campers: ${this.state.campers}
+                        \nHike-In? ${this.state.hikeIn}
+                        \nDate: ${this.state.date}`;
+        Alert.alert(
+            'Begin Search?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                    onPress: () => this.resetForm()
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        this.presentLocalNotification(this.state.date.toLocaleDateString('en-US'));
+                        this.resetForm();
+                    }
+                }
+
+            ],
+            { cancelable: false }
+        );
     }
 
     resetForm() {
         this.setState({
             campers: 1,
             hikeIn: false,
-            date: new Date(),
-            showCalendar: false,
-            showModal: false
+            date: '',
+            // showModal: false
         });
     }
 
+    async presentLocalNotification(date) {
+        function sendNotification() {
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: true
+                })
+            });
+
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Your Campsite Reservation Search',
+                    body: `Search for ${date} requested`
+                },
+                trigger: null
+            });
+        }
+
+        let permissions = await Notifications.getPermissionsAsync();
+        if (!permissions.granted) {
+            permissions = await Notifications.requestPermissionsAsync();
+        }
+        if (permissions.granted) {
+            sendNotification();
+        }
+    }
+
+
     render() {
         return (
-            <ScrollView>
+            <Animatable.View animation='zoomIn' duration={2000}>
                 <View style={styles.formRow}>
                     <Text style={styles.formLabel}>Number of Campers</Text>
                     <Picker
@@ -99,34 +147,27 @@ class Reservation extends Component {
                         accessibilityLabel='Tap me to search for available campsites to reserve'
                     />
                 </View>
-                <Modal
+                {/* <Modal 
                     animationType={'slide'}
                     transparent={false}
                     visible={this.state.showModal}
-                    onRequestClose={() => this.toggleModal()}
-                >
+                    onRequestClose={() => this.toggleModal()}>
                     <View style={styles.modal}>
-                        <Text style={styles.modalTitle}>Search Campsite Reservations</Text>
-                        <Text style={styles.modalText}>
-                            Number of Campers: {this.state.campers}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Hike-In?: {this.state.hikeIn ? 'Yes' : 'No'}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Date: {this.state.date.toLocaleDateString('en-US')}
-                        </Text>
-                        <Button
+                        <Text style={styles.modalTitle}> Search Campsite Reservations </Text>
+                        <Text style={styles.modalText}> Number of Campers: {this.state.campsers} </Text>
+                        <Text style={styles.modalText}> Hike In?: {this.state.hikeIn ? 'Yes' : 'No'} </Text>
+                        <Text style={styles.modalText}> Date: {this.state.date} </Text>
+                        <Button 
                             onPress={() => {
-                                this.toggleModal();
-                                this.resetForm();
+                                this.toggleModal(); 
+                                this.resetForm(); 
                             }}
                             color='#5637DD'
                             title='Close'
-                        />
+                        />    
                     </View>
-                </Modal>
-            </ScrollView>
+                </Modal> */}
+            </Animatable.View>
         );
     }
 }
@@ -146,7 +187,6 @@ const styles = StyleSheet.create({
     formItem: {
         flex: 1
     },
-
     modal: {
         justifyContent: 'center',
         margin: 20
@@ -156,7 +196,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         backgroundColor: '#5637DD',
         textAlign: 'center',
-        color: '#fff',
+        color: '#FFF',
         marginBottom: 20
     },
     modalText: {
@@ -165,4 +205,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Reservation;
+export default Reservation; 
