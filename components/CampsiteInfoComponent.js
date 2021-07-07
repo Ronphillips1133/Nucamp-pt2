@@ -75,6 +75,7 @@ function RenderCampsite(props) {
         });
     };
 
+
     if (campsite) {
         return (
             <Animatable.View
@@ -111,10 +112,9 @@ function RenderCampsite(props) {
                             name={'share'}
                             type='font-awesome'
                             color='#5637DD'
-                            style={styles.cardItem}
                             raised
                             reverse
-                            onPress={() => shareCampsite(campsite.name, campsite.description, baseUrl + campsiteId.image)}
+                            onPress={() => shareCampsite(campsite.name, campsite.description, baseUrl + campsite.image)}
                         />
                     </View>
                 </Card>
